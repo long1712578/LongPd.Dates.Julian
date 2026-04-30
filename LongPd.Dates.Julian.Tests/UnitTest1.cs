@@ -3,26 +3,17 @@ using LongPd.Dates.Julian;
 namespace LongPd.Dates.Julian.Tests;
 
 /// <summary>
-/// Unit tests for JulianExtensions covering JD, MJD, and Ordinal Date conversions.
-/// Reference values verified against the U.S. Naval Observatory and Jean Meeus
-/// "Astronomical Algorithms" (2nd ed.).
+/// Unit tests for JulianExtensions covering JD, MJD, and Ordinal Date conversion.
 /// </summary>
 public class JulianExtensionsTests
 {
-    // ──────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ──────────────────────────────────────────────────────────────────────────
 
-    private const double Tolerance = 1e-6; // ~86 ms in JD units
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // ToAstronomicalJD
-    // ──────────────────────────────────────────────────────────────────────────
+    private const double Tolerance = 1e-6;
 
     [Fact]
     public void ToAstronomicalJD_J2000Epoch_ReturnsKnownValue()
     {
-        // J2000.0 = 2000-01-01 12:00:00 UTC → JD 2451545.0  (Meeus p. 62)
+        // J2000.0 = 2000-01-01 12:00:00 UTC → JD 2451545.0
         var date = new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         double jd = date.ToAstronomicalJD();
         Assert.Equal(2451545.0, jd, 5);
@@ -41,7 +32,7 @@ public class JulianExtensionsTests
     {
         // 2000-02-29 exists (year 2000 is a leap year) — century divisible by 400
         var leapDay = new DateTime(2000, 2, 29, 0, 0, 0, DateTimeKind.Utc);
-        double jd = leapDay.ToAstronomicalJD(); // must not throw
+        double jd = leapDay.ToAstronomicalJD();
         Assert.True(jd > 0);
     }
 
@@ -57,10 +48,6 @@ public class JulianExtensionsTests
 
         Assert.Equal(jdUtc, jdLocal, 5);
     }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // FromAstronomicalJD
-    // ──────────────────────────────────────────────────────────────────────────
 
     [Fact]
     public void FromAstronomicalJD_J2000Epoch_ReturnsCorrectDateTime()
@@ -85,9 +72,6 @@ public class JulianExtensionsTests
         Assert.Equal(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc), result);
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // Round-trip: ToAstronomicalJD / FromAstronomicalJD
-    // ──────────────────────────────────────────────────────────────────────────
 
     [Theory]
     [InlineData(2000, 1, 1, 0, 0, 0, 0)]       // Start of Y2K
@@ -105,9 +89,6 @@ public class JulianExtensionsTests
         Assert.Equal(original, recovered);
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // ToModifiedJulianDate / FromModifiedJulianDate
-    // ──────────────────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToModifiedJulianDate_MjdEpoch_ReturnsZero()
@@ -134,10 +115,6 @@ public class JulianExtensionsTests
         Assert.Equal(original, recovered);
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // ToOrdinalDate
-    // ──────────────────────────────────────────────────────────────────────────
-
     [Theory]
     [InlineData(2026, 1, 1, 2026001)]   // First day of year
     [InlineData(2026, 12, 31, 2026365)] // Last day of non-leap year
@@ -151,9 +128,6 @@ public class JulianExtensionsTests
         Assert.Equal(expected, date.ToOrdinalDate());
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // FromOrdinalDate
-    // ──────────────────────────────────────────────────────────────────────────
 
     [Theory]
     [InlineData(2026001, 2026, 1, 1)]
@@ -186,10 +160,6 @@ public class JulianExtensionsTests
         Assert.Throws<ArgumentOutOfRangeException>(() => 2000367.FromOrdinalDate());
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // Round-trip: ToOrdinalDate / FromOrdinalDate
-    // ──────────────────────────────────────────────────────────────────────────
-
     [Theory]
     [InlineData(2000, 1, 1)]
     [InlineData(2000, 2, 29)]
@@ -204,14 +174,9 @@ public class JulianExtensionsTests
         Assert.Equal(original, recovered);
     }
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // ToVietnameseLunar – stub contract
-    // ──────────────────────────────────────────────────────────────────────────
-
     [Fact]
     public void ToVietnameseLunar_Always_ThrowsNotImplementedException()
     {
-        Assert.Throws<NotImplementedException>(() =>
-            DateTime.Now.ToVietnameseLunar());
+        Assert.Throws<NotImplementedException>(() => DateTime.Now.ToVietnameseLunar());
     }
 }
