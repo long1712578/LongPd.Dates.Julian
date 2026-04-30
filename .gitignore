@@ -1,0 +1,82 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# .NET / Visual Studio
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Build output
+[Bb]in/
+[Oo]bj/
+out/
+publish/
+
+# NuGet packages (restored automatically by dotnet restore)
+*.nupkg
+*.snupkg
+[Pp]ackages/
+!**/[Pp]ackages/repositories.config
+
+# NuGet local cache
+.nuget/
+
+# MSBuild
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio files
+.vs/
+*.vcxproj.filters
+*.vcxproj.user
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Test results
+TestResults/
+coverage*/
+*.trx
+*.coverage
+*.coveragexml
+
+# Crash dumps
+*.dmp
+
+# ──────────────────────────────────────────────────────────────────────────────
+# .NET publish / deployment
+# ──────────────────────────────────────────────────────────────────────────────
+**/Properties/launchSettings.json
+launchSettings.json
+
+# ──────────────────────────────────────────────────────────────────────────────
+# OS
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Secrets / Keys — NEVER commit these
+# ──────────────────────────────────────────────────────────────────────────────
+*.pfx
+*.key
+appsettings.*.json
+!appsettings.json
+secrets.json
+nuget.config        # may contain API keys — keep locally only

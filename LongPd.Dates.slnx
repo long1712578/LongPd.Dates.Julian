@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="LongPd.Dates.Julian.Tests/LongPd.Dates.Julian.Tests.csproj" />
+  <Project Path="LongPd.Dates.Julian/LongPd.Dates.Julian.csproj" />
+</Solution>
