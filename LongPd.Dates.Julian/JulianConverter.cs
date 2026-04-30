@@ -65,13 +65,11 @@ namespace LongPd.Dates.Julian
         {
             double z = Math.Floor(jd + 0.5);
             double f = (jd + 0.5) - z;
-            double a = z;
 
-            if (z >= 2299161)
-            {
-                double alpha = Math.Floor((z - 1867216.25) / 36524.25);
-                a = z + 1 + alpha - Math.Floor(alpha / 4);
-            }
+            // Always use proleptic Gregorian correction — consistent with ToAstronomicalJD
+            // and with .NET DateTime which uses proleptic Gregorian for all dates.
+            double alpha = Math.Floor((z - 1867216.25) / 36524.25);
+            double a = z + 1 + alpha - Math.Floor(alpha / 4);
 
             double b = a + 1524;
             double c = Math.Floor((b - 122.1) / 365.25);

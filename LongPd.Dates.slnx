@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="LongPd.Dates.Julian.Benchmarks/LongPd.Dates.Julian.Benchmarks.csproj" />
+  <Project Path="LongPd.Dates.Julian.Playground/LongPd.Dates.Julian.Playground.csproj" />
   <Project Path="LongPd.Dates.Julian.Tests/LongPd.Dates.Julian.Tests.csproj" />
   <Project Path="LongPd.Dates.Julian/LongPd.Dates.Julian.csproj" />
 </Solution>
