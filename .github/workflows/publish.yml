@@ -1,45 +1,37 @@
 name: Build, Test & Publish to NuGet
 
 on:
-  push:
-    tags:
-      - "v*.*.*"   # Trigger khi push tag dạng v1.0.0, v1.1.0, ...
+  release:
+    types: [published]
 
 jobs:
   build-test-publish:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout source code
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Cài .NET SDK
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.0.x
-            10.0.x
+          dotnet-version: 8.0.x
 
-      # 3. Restore dependencies
       - name: Restore
         run: dotnet restore
 
-      # 4. Build Release
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      # 5. Chạy toàn bộ Unit Test — nếu fail thì DỪNG, không publish
+      # Neu bat ky test nao fail - workflow dung, khong publish
       - name: Test
         run: dotnet test --configuration Release --no-build --verbosity normal
 
-      # 6. Lấy version từ Git tag (bỏ chữ "v" ở đầu: v1.0.0 → 1.0.0)
+      # Lay version tu release tag (bo 'v': v1.0.0 -> 1.0.0)
       - name: Extract version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      # 7. Pack thành file .nupkg với version từ tag
       - name: Pack
         run: >
           dotnet pack LongPd.Dates.Julian/LongPd.Dates.Julian.csproj
@@ -48,7 +40,6 @@ jobs:
           -p:PackageVersion=${{ steps.version.outputs.VERSION }}
           --output ./artifacts
 
-      # 8. Push lên NuGet.org
       - name: Publish to NuGet
         run: >
           dotnet nuget push ./artifacts/*.nupkg
