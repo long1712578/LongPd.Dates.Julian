@@ -28,6 +28,8 @@
     </PackageReleaseNotes>
     <Copyright>Copyright © 2025 Phạm Đình Long</Copyright>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>
