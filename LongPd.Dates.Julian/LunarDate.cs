@@ -36,7 +36,7 @@ namespace LongPd.Dates.Julian
             && Year == other.Year && IsLeapMonth == other.IsLeapMonth;
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is LunarDate ld && Equals(ld);
+        public override bool Equals(object? obj) => obj is LunarDate ld && Equals(ld);
 
         /// <inheritdoc/>
         public override int GetHashCode()

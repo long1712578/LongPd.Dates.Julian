@@ -23,6 +23,34 @@ namespace LongPd.Dates.Julian
         private const double VietnamTz = 7.0;
         private const double DegToRad = Math.PI / 180.0;
 
+        #region Month-11 Cache (one-time pre-computation)
+
+        // Cache month-11 JD for years MinCacheYear..MaxCacheYear.
+        // Eliminates repeated NewMoon + SunLongitude calls on the hot path.
+        // Total init cost: ~250µs (computed once at class load).
+        private const int MinCacheYear = 1998;
+        private const int MaxCacheYear = 2102;
+        private static readonly int[] Month11Cache;
+
+        static VietnameseLunarCalendar()
+        {
+            int count = MaxCacheYear - MinCacheYear + 1;
+            Month11Cache = new int[count];
+            try
+            {
+                for (int y = MinCacheYear; y <= MaxCacheYear; y++)
+                    Month11Cache[y - MinCacheYear] = ComputeLunarMonth11(y, VietnamTz);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    "Failed to initialize Vietnamese Lunar Calendar month-11 cache. " +
+                    "This is an internal error — please file an issue.", ex);
+            }
+        }
+
+        #endregion
+
         #region Astronomical Core (Pure Functions)
 
         /// <summary>
@@ -274,8 +302,29 @@ namespace LongPd.Dates.Julian
         private static int GetNewMoonDay(int k, double timeZone)
             => (int)Math.Floor(NewMoon(k) + 0.5 + timeZone / 24.0);
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
+        /// <summary>
+        /// Gets the month-11 JD. Uses O(1) cache for Vietnam timezone (hot path),
+        /// falls back to astronomical computation for custom timezones.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int GetLunarMonth11(int yy, double timeZone)
+        {
+            // Fast path: cached lookup for Vietnam timezone (covers 99%+ of calls).
+            // Exact double equality is safe here: VietnamTz = 7.0 is exactly
+            // representable in IEEE 754 and all callers use the constant directly.
+            if (timeZone == VietnamTz && yy >= MinCacheYear && yy <= MaxCacheYear)
+                return Month11Cache[yy - MinCacheYear];
+
+            // Slow path: full astronomical computation
+            return ComputeLunarMonth11(yy, timeZone);
+        }
+
+        /// <summary>
+        /// Raw astronomical computation of month-11 JD (uncached).
+        /// Called by static constructor for cache init and as fallback.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static int ComputeLunarMonth11(int yy, double timeZone)
         {
             double off = JulianDayFromDate(31, 12, yy) - 2415021.0;
             int k = (int)Math.Floor(off / 29.530588853);

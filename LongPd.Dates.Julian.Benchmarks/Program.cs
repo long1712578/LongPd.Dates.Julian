@@ -5,7 +5,7 @@ using LongPd.Dates.Julian;
 BenchmarkRunner.Run<JulianBenchmarks>();
 
 [MemoryDiagnoser]
-[ShortRunJob]
+[MediumRunJob] // 15 iterations for stable results (vs ShortRunJob's 3)
 public class JulianBenchmarks
 {
     private readonly DateTime _date = new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc);
@@ -33,6 +33,6 @@ public class JulianBenchmarks
     // ── Astronomical Core ───────────────────────────────────────────────────
 
     [Benchmark] public double SunLongitude()  => VietnameseLunarCalendar.SunLongitude(_jd);
-    [Benchmark] public double NewMoon()       => VietnameseLunarCalendar.NewMoon(1533);
+    [Benchmark] public double NewMoon()       => VietnameseLunarCalendar.NewMoon(1534);
     [Benchmark] public int LutDecode()        => VietnameseLunarCalendar.DecodeLutEntry(2025);
 }
