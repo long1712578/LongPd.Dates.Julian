@@ -1,30 +1,31 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.3</LangVersion>
-    <Nullable>disable</Nullable>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <!-- NuGet Package Metadata -->
     <PackageId>LongPd.Dates.Julian</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Phạm Đình Long</Authors>
     <Company>LongPd</Company>
     <Product>LongPd.Dates.Julian</Product>
-    <Description>A high-performance, zero-allocation .NET library for Julian Date (JD), Modified Julian Date (MJD), and Ordinal Date (YYYYDDD) conversions. AOT-compatible and optimized for low-latency applications.</Description>
+    <Description>A high-performance, zero-allocation .NET library for Julian Date (JD), Modified Julian Date (MJD), Ordinal Date (YYYYDDD), Vietnamese Lunar Calendar, and Solar Term (Tiết Khí) conversions. AOT-compatible and optimized for low-latency applications.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/long1712578/LongPd.Dates.Julian</PackageProjectUrl>
     <RepositoryUrl>https://github.com/long1712578/LongPd.Dates.Julian</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>datetime;julian;mjd;ordinal;astronomy;extensions;high-performance;zero-allocation</PackageTags>
+    <PackageTags>datetime;julian;mjd;ordinal;lunar;vietnamese;solar-term;astronomy;high-performance;zero-allocation</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>
-      v1.0.0 — Initial release.
-      - ToAstronomicalJD / FromAstronomicalJD
-      - ToModifiedJulianDate / FromModifiedJulianDate
-      - ToOrdinalDate / FromOrdinalDate
-      - Vietnamese Lunar Calendar stub (v1.1.0 roadmap)
+      v1.1.0 — Vietnamese Lunar Calendar &amp; Solar Terms.
+      - ToVietnameseLunar / FromVietnameseLunar (astronomical algorithm)
+      - GetSolarTerm / GetSolarTermName (24 Solar Terms)
+      - LunarDate readonly struct with equality semantics
+      - ReadOnlySpan&lt;byte&gt; LUT for month-length data (2000-2100)
+      - Pure functions, zero allocations, AggressiveInlining
     </PackageReleaseNotes>
     <Copyright>Copyright © 2025 Phạm Đình Long</Copyright>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>

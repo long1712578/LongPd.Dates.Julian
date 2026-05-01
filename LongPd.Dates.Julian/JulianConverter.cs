@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace LongPd.Dates.Julian
@@ -124,19 +124,35 @@ namespace LongPd.Dates.Julian
 
         /// <summary>
         /// Converts a Gregorian <see cref="DateTime"/> to the Vietnamese Lunar Calendar date.
+        /// Uses astronomical algorithms (New Moon + Sun Longitude) with UTC+7 timezone.
         /// </summary>
         /// <param name="date">The Gregorian date to convert.</param>
-        /// <returns>A tuple of (Day, Month, Year, IsLeapMonth).</returns>
-        /// <exception cref="NotImplementedException">
-        /// This method will be fully implemented in v1.1.0 using a high-performance
-        /// New Moon phase lookup table (LUT).
-        /// </exception>
-        public static (int Day, int Month, int Year, bool IsLeapMonth) ToVietnameseLunar(this DateTime date)
-        {
-            // v1.1.0: High-performance implementation will use a pre-computed
-            // New Moon phase lookup table (LUT) covering years 1900–2100
-            // for O(1) lookup performance.
-            throw new NotImplementedException("Vietnamese Lunar conversion will be available in v1.1.0");
-        }
+        /// <returns>A <see cref="LunarDate"/> with Day, Month, Year, and IsLeapMonth.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static LunarDate ToVietnameseLunar(this DateTime date)
+            => VietnameseLunarCalendar.ToLunar(date);
+
+        /// <summary>
+        /// Converts a Vietnamese Lunar date back to Gregorian <see cref="DateTime"/>.
+        /// </summary>
+        public static DateTime FromVietnameseLunar(int lunarDay, int lunarMonth, int lunarYear, bool isLeapMonth = false)
+            => VietnameseLunarCalendar.FromLunar(lunarDay, lunarMonth, lunarYear, isLeapMonth);
+
+        /// <summary>
+        /// Gets the Solar Term index (0-23) for a given Gregorian date.
+        /// Based on Sun's ecliptic longitude calculated from Julian Date.
+        /// </summary>
+        /// <param name="date">The Gregorian date.</param>
+        /// <returns>Solar term index (0=Xuân Phân, 1=Thanh Minh, ..., 23=Kinh Trập).</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetSolarTerm(this DateTime date)
+            => VietnameseLunarCalendar.GetSolarTermIndex(date);
+
+        /// <summary>
+        /// Gets the Vietnamese name of the Solar Term for a given date.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string GetSolarTermName(this DateTime date)
+            => VietnameseLunarCalendar.GetSolarTermName(date.GetSolarTerm());
     }
 }
