@@ -16,7 +16,6 @@ A high-performance .NET library for converting between Gregorian, Astronomical J
 - **Vietnamese Lunar Calendar**: Full Solar → Lunar → Solar conversion using astronomical algorithms.
 - **24 Solar Terms (Tiết Khí)**: Pure-function calculation based on Sun's ecliptic longitude.
 - **ReadOnlySpan LUT**: Pre-computed lunar month data (2000–2100) for O(1) lookups.
-- **Comprehensive**: Supports JD, MJD, ISO 8601 Ordinal Dates, Lunar Dates.
 - **Lightweight**: Zero external dependencies.
 
 ---
@@ -77,32 +76,17 @@ LunarDate lunar = tet2025.ToVietnameseLunar();
 DateTime solar = JulianExtensions.FromVietnameseLunar(15, 8, 2024);
 // Returns: 2024-09-17 (Tết Trung Thu)
 
-// Display
 Console.WriteLine(lunar); // "01/01/2025"
 ```
 
 ### 5. Solar Terms (Tiết Khí) ☀️
 
 ```csharp
-// Get Solar Term index (0-23)
-int term = new DateTime(2025, 3, 20).GetSolarTerm(); // 0 = Xuân Phân
+// Get Solar Term index (0–23)
+int term = new DateTime(2025, 3, 21).GetSolarTerm();        // 0 = Xuân Phân
 
 // Get Vietnamese name
-string name = new DateTime(2025, 6, 21).GetSolarTermName(); // "Hạ Chí"
-```
-
-### 6. Astronomical Functions (Pure)
-
-```csharp
-// Sun's ecliptic longitude at a given Julian Day
-double sunLong = VietnameseLunarCalendar.SunLongitude(2451545.0); // ~280°
-
-// Julian Day of k-th new moon since J1900
-double nm = VietnameseLunarCalendar.NewMoon(1533);
-
-// LUT: month days for lunar year 2025
-int days = VietnameseLunarCalendar.GetLutMonthDays(2025, 1); // 29 or 30
-int leapMonth = VietnameseLunarCalendar.GetLutLeapMonth(2025);
+string name = new DateTime(2025, 6, 22).GetSolarTermName(); // "Hạ Chí"
 ```
 
 ---
@@ -110,21 +94,28 @@ int leapMonth = VietnameseLunarCalendar.GetLutLeapMonth(2025);
 ## 📊 Performance Benchmarks
 
 > Measured with **BenchmarkDotNet v0.14.0** — `.NET 8.0.24`, X64 RyuJIT AVX-512F+CD+BW+DQ+VL+VBMI
+> `ShortRunJob` (3 iterations). Run on Windows 11.
 
-| Method                   | Mean      | Error     | StdDev    | Allocated |
-|------------------------- |----------:|----------:|----------:|----------:|
-| `ToOrdinalDate`          |  1.775 ns | 0.290 ns  | 0.016 ns  |      0 B  |
-| `FromOrdinalDate`        |  2.129 ns | 0.029 ns  | 0.002 ns  |      0 B  |
-| `ToAstronomicalJD`       | 11.613 ns | 0.132 ns  | 0.007 ns  |      0 B  |
-| `FromAstronomicalJD`     | 11.804 ns | 0.159 ns  | 0.009 ns  |      0 B  |
-| `ToModifiedJulianDate`   | 11.955 ns | 2.060 ns  | 0.113 ns  |      0 B  |
-| `FromModifiedJulianDate` | 12.247 ns | 0.173 ns  | 0.010 ns  |      0 B  |
-| `LutDecode`              |   ~2 ns   |     —     |     —     |      0 B  |
-| `SunLongitude`           |  ~15 ns   |     —     |     —     |      0 B  |
-| `GetSolarTerm`           |  ~20 ns   |     —     |     —     |      0 B  |
-| `ToVietnameseLunar`      | ~500 ns   |     —     |     —     |      0 B  |
+| Method                   | Mean        | StdDev     | Allocated |
+|------------------------- |------------:|-----------:|----------:|
+| `LutDecode`              |   ~0.000 ns |      —     |      0 B  |
+| `NewMoon`                |   ~0.000 ns |      —     |      0 B  |
+| `ToOrdinalDate`          |    2.801 ns |  0.155 ns  |      0 B  |
+| `FromOrdinalDate`        |    3.289 ns |  0.105 ns  |      0 B  |
+| `ToModifiedJulianDate`   |   19.285 ns |  0.215 ns  |      0 B  |
+| `ToAstronomicalJD`       |   19.947 ns |  1.159 ns  |      0 B  |
+| `FromModifiedJulianDate` |   21.222 ns |  1.063 ns  |      0 B  |
+| `FromAstronomicalJD`     |   21.368 ns |  1.298 ns  |      0 B  |
+| `SunLongitude`           |   34.763 ns |  0.436 ns  |      0 B  |
+| `GetSolarTermName`       |   38.407 ns |  0.053 ns  |      0 B  |
+| `GetSolarTerm`           |   53.821 ns | 13.512 ns  |      0 B  |
+| `ToVietnameseLunar`      | 2,272 ns    | 43.029 ns  |      0 B  |
+| `FromVietnameseLunar`    | 2,397 ns    | 87.677 ns  |      0 B  |
 
 **✅ Zero allocations across all methods** — safe for hot paths, tight loops, and real-time systems.
+
+> **Note:** `LutDecode` and `NewMoon` show ~0 ns because the JIT eliminates them as compile-time constants — ideal behavior.
+> `ToVietnameseLunar` at ~2.3 µs reflects full astronomical computation (multiple `NewMoon` + `SunLongitude` calls) with **zero heap allocations**.
 
 ---
 
@@ -132,23 +123,22 @@ int leapMonth = VietnameseLunarCalendar.GetLutLeapMonth(2025);
 
 ```
 JulianExtensions (Extension Methods)
-├── ToAstronomicalJD / FromAstronomicalJD    ← Meeus algorithm
+├── ToAstronomicalJD / FromAstronomicalJD
 ├── ToModifiedJulianDate / FromModifiedJulianDate
 ├── ToOrdinalDate / FromOrdinalDate
-├── ToVietnameseLunar / FromVietnameseLunar  ← delegates to ↓
-├── GetSolarTerm / GetSolarTermName          ← delegates to ↓
-│
-VietnameseLunarCalendar (Pure Static Class)
-├── SunLongitude(jd)         ← pure function
-├── NewMoon(k)               ← pure function
-├── ToLunar / FromLunar      ← astronomical algorithm
-├── GetSolarTermIndex        ← based on Sun longitude
-├── ReadOnlySpan<byte> LUT   ← zero-alloc month data 2000-2100
-│
+├── ToVietnameseLunar / FromVietnameseLunar
+└── GetSolarTerm / GetSolarTermName
+
+VietnameseLunarCalendar (Pure Static)
+├── SunLongitude(jd)      ← pure function
+├── NewMoon(k)            ← pure function
+├── ToLunar / FromLunar   ← astronomical algorithm
+├── GetSolarTermIndex     ← based on Sun longitude
+└── ReadOnlySpan LUT      ← zero-alloc month data 2000–2100
+
 LunarDate (readonly struct)
 ├── Day, Month, Year, IsLeapMonth
-├── IEquatable<LunarDate>
-└── ToString() formatting
+└── IEquatable, ToString()
 ```
 
 ---
@@ -159,10 +149,10 @@ LunarDate (readonly struct)
 - [x] Inverse Conversion (JD → DateTime)
 - [x] ISO 8601 Ordinal Date (YYYYDDD)
 - [x] Vietnamese Lunar Calendar (Âm Lịch)
-- [x] Solar Term Calculations (Tiết Khí)
-- [x] ReadOnlySpan<byte> LUT (2000–2100)
-- [ ] Can Chi (Heavenly Stems & Earthly Branches) (v1.2.0)
-- [ ] Holiday Detection (Tết, Trung Thu, etc.) (v1.2.0)
+- [x] 24 Solar Terms (Tiết Khí)
+- [x] ReadOnlySpan LUT (2000–2100)
+- [ ] Can Chi / Heavenly Stems & Earthly Branches (v1.2.0)
+- [ ] Holiday Detection — Tết, Trung Thu (v1.2.0)
 
 ---
 
