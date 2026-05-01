@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -25,13 +25,23 @@
       - GetSolarTerm / GetSolarTermName (24 Solar Terms)
       - LunarDate readonly struct with equality semantics
       - ReadOnlySpan&lt;byte&gt; LUT for month-length data (2000-2100)
+      - Multi-target: netstandard2.0 + net8.0
       - Pure functions, zero allocations, AggressiveInlining
     </PackageReleaseNotes>
     <Copyright>Copyright © 2025 Phạm Đình Long</Copyright>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <IsAotCompatible>true</IsAotCompatible>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
+
+  <!-- AOT compatible only on net8.0+ -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <!-- netstandard2.0 needs System.Memory for ReadOnlySpan<T> -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />

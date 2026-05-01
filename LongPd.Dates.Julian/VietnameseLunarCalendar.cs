@@ -366,7 +366,13 @@ namespace LongPd.Dates.Julian
         // Bit 16: leap month has 30 days (1) or 29 days (0)
         // Bits 15-4: month lengths for months 1-12 (1=30 days, 0=29 days)
         // Bits 3-0: leap month number (0 = no leap month)
+#if NET8_0_OR_GREATER
+        // Zero-alloc: compiler embeds byte data directly in assembly metadata.
         private static ReadOnlySpan<byte> LunarLut => new byte[] {
+#else
+        // netstandard2.0 fallback: one-time heap allocation (~303 bytes).
+        private static readonly byte[] LunarLut = new byte[] {
+#endif
             0x00, 0xC9, 0x60, // 2000: 0C960
             0x00, 0xD4, 0xA0, // 2001: 0D4A0
             0x00, 0xDA, 0x50, // 2002: 0DA50
@@ -480,9 +486,8 @@ namespace LongPd.Dates.Julian
             int idx = year - LutBaseYear;
             if ((uint)idx >= LutYearCount) return -1;
 
-            ReadOnlySpan<byte> lut = LunarLut;
             int offset = idx * 3;
-            return (lut[offset] << 16) | (lut[offset + 1] << 8) | lut[offset + 2];
+            return (LunarLut[offset] << 16) | (LunarLut[offset + 1] << 8) | LunarLut[offset + 2];
         }
 
         /// <summary>
