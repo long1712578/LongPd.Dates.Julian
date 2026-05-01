@@ -10,11 +10,18 @@ Job=ShortRun  IterationCount=3  LaunchCount=1
 WarmupCount=3  
 
 ```
-| Method                 | Mean      | Error     | StdDev    | Allocated |
-|----------------------- |----------:|----------:|----------:|----------:|
-| ToAstronomicalJD       | 11.613 ns | 0.1321 ns | 0.0072 ns |         - |
-| FromAstronomicalJD     | 11.804 ns | 0.1591 ns | 0.0087 ns |         - |
-| ToModifiedJulianDate   | 11.955 ns | 2.0601 ns | 0.1129 ns |         - |
-| FromModifiedJulianDate | 12.247 ns | 0.1727 ns | 0.0095 ns |         - |
-| ToOrdinalDate          |  1.775 ns | 0.2895 ns | 0.0159 ns |         - |
-| FromOrdinalDate        |  2.129 ns | 0.0285 ns | 0.0016 ns |         - |
+| Method                 | Mean          | Error      | StdDev    | Allocated |
+|----------------------- |--------------:|-----------:|----------:|----------:|
+| ToAstronomicalJD       |    11.7359 ns |  1.2807 ns | 0.0702 ns |         - |
+| FromAstronomicalJD     |    11.9438 ns |  1.6087 ns | 0.0882 ns |         - |
+| ToModifiedJulianDate   |    11.9534 ns |  1.2349 ns | 0.0677 ns |         - |
+| FromModifiedJulianDate |    12.3780 ns |  0.6746 ns | 0.0370 ns |         - |
+| ToOrdinalDate          |     3.2129 ns |  7.1746 ns | 0.3933 ns |         - |
+| FromOrdinalDate        |     1.4742 ns |  0.8574 ns | 0.0470 ns |         - |
+| ToVietnameseLunar      | 1,430.0815 ns | 24.1761 ns | 1.3252 ns |         - |
+| FromVietnameseLunar    | 1,374.5595 ns | 63.5028 ns | 3.4808 ns |         - |
+| GetSolarTerm           |    36.0802 ns |  0.1006 ns | 0.0055 ns |         - |
+| GetSolarTermName       |    38.0078 ns |  1.0606 ns | 0.0581 ns |         - |
+| SunLongitude           |    20.7244 ns |  0.3554 ns | 0.0195 ns |         - |
+| NewMoon                |     0.0151 ns |  0.0061 ns | 0.0003 ns |         - |
+| LutDecode              |     0.0000 ns |  0.0000 ns | 0.0000 ns |         - |

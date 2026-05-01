@@ -1,3 +1,12 @@
+// Vietnamese Lunar Calendar algorithm ported from:
+//   Hồ Ngọc Đức, "Vietnamese Lunar Calendar"
+//   https://www.informatik.uni-leipzig.de/~duc/amlich/
+//   Original source released freely for public use.
+//
+// Astronomical formulas (NewMoon, SunLongitude) based on:
+//   Jean Meeus, "Astronomical Algorithms", 2nd Edition (Willmann-Bell, 1998).
+//   Mathematical formulas are not subject to copyright.
+
 using System;
 using System.Runtime.CompilerServices;
 
@@ -5,7 +14,8 @@ namespace LongPd.Dates.Julian
 {
     /// <summary>
     /// High-performance Vietnamese Lunar Calendar conversion.
-    /// Algorithm based on Hồ Ngọc Đức with Julian Date optimizations.
+    /// Algorithm ported from Hồ Ngọc Đức's public domain implementation,
+    /// with .NET optimizations and ReadOnlySpan LUT for 2000–2100.
     /// All methods are pure functions with zero allocations.
     /// </summary>
     public static class VietnameseLunarCalendar
@@ -153,6 +163,7 @@ namespace LongPd.Dates.Julian
         /// <summary>
         /// Converts a Gregorian date to Lunar date with a custom timezone offset.
         /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static LunarDate ToLunar(int dd, int mm, int yy, double timeZone)
         {
             int dayNumber = JulianDayFromDate(dd, mm, yy);
@@ -208,6 +219,7 @@ namespace LongPd.Dates.Julian
         /// <summary>
         /// Converts a Vietnamese Lunar date back to Gregorian <see cref="DateTime"/> with custom timezone.
         /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static DateTime FromLunar(int lunarDay, int lunarMonth, int lunarYear, bool isLeapMonth, double timeZone)
         {
             int a11, b11;
@@ -222,6 +234,12 @@ namespace LongPd.Dates.Julian
                 b11 = GetLunarMonth11(lunarYear + 1, timeZone);
             }
 
+            // Validate leap month request before going further
+            if (isLeapMonth && b11 - a11 <= 365)
+                throw new ArgumentException(
+                    $"Year {lunarYear} has no leap month.",
+                    nameof(isLeapMonth));
+
             int k = (int)Math.Floor(0.5 + (a11 - 2415021.076998695) / 29.530588853);
             int off = lunarMonth - 11;
             if (off < 0) off += 12;
@@ -233,7 +251,9 @@ namespace LongPd.Dates.Julian
                 if (leapMonth < 0) leapMonth += 12;
 
                 if (isLeapMonth && lunarMonth != leapMonth)
-                    return DateTime.MinValue; // invalid leap month
+                    throw new ArgumentException(
+                        $"Year {lunarYear} has no leap month {lunarMonth}. Leap month is {leapMonth}.",
+                        nameof(isLeapMonth));
 
                 if (isLeapMonth || (off >= leapOff))
                     off += 1;
@@ -254,6 +274,7 @@ namespace LongPd.Dates.Julian
         private static int GetNewMoonDay(int k, double timeZone)
             => (int)Math.Floor(NewMoon(k) + 0.5 + timeZone / 24.0);
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static int GetLunarMonth11(int yy, double timeZone)
         {
             double off = JulianDayFromDate(31, 12, yy) - 2415021.0;
@@ -267,6 +288,7 @@ namespace LongPd.Dates.Julian
             return nm;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static int GetLeapMonthOffset(int a11, double timeZone)
         {
             int k = (int)Math.Floor((a11 - 2415021.076998695) / 29.530588853 + 0.5);
@@ -493,7 +515,7 @@ namespace LongPd.Dates.Julian
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetSolarTermName(int index)
-            => SolarTermVietnamese[index % 24];
+            => SolarTermVietnamese[((index % 24) + 24) % 24];
 
         #endregion
     }

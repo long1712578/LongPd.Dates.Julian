@@ -521,4 +521,26 @@ public class SolarTermTests
         Assert.Equal(4, m);
         Assert.Equal(2025, y);
     }
+
+    // ── Bug fix regression: negative index in GetSolarTermName ───────────────
+
+    [Theory]
+    [InlineData(-1, "Kinh Trập")]   // -1 % 24 + 24 = 23 → Kinh Trập
+    [InlineData(-24, "Xuân Phân")]  // -24 % 24 + 24 = 0 → Xuân Phân
+    public void GetSolarTermName_NegativeIndex_DoesNotThrow(int index, string expected)
+    {
+        string name = VietnameseLunarCalendar.GetSolarTermName(index);
+        Assert.Equal(expected, name);
+    }
+
+    // ── Bug fix regression: invalid leap month throws ArgumentException ───────
+
+    [Fact]
+    public void FromLunar_InvalidLeapMonth_ThrowsArgumentException()
+    {
+        // Year 2000 has no leap month (GetLutLeapMonth returns 0)
+        // Asking for leap month 1 should throw
+        Assert.Throws<ArgumentException>(() =>
+            JulianExtensions.FromVietnameseLunar(1, 1, 2000, isLeapMonth: true));
+    }
 }
