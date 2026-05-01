@@ -94,28 +94,28 @@ string name = new DateTime(2025, 6, 22).GetSolarTermName(); // "Hạ Chí"
 ## 📊 Performance Benchmarks
 
 > Measured with **BenchmarkDotNet v0.14.0** — `.NET 8.0.24`, X64 RyuJIT AVX-512F+CD+BW+DQ+VL+VBMI
-> `ShortRunJob` (3 iterations). Run on Windows 11.
+> `MediumRunJob` (15 iterations × 2 launches, 10 warmup). Run on Windows 11.
 
 | Method                   | Mean        | StdDev     | Allocated |
 |------------------------- |------------:|-----------:|----------:|
 | `LutDecode`              |   ~0.000 ns |      —     |      0 B  |
 | `NewMoon`                |   ~0.000 ns |      —     |      0 B  |
-| `ToOrdinalDate`          |    2.801 ns |  0.155 ns  |      0 B  |
-| `FromOrdinalDate`        |    3.289 ns |  0.105 ns  |      0 B  |
-| `ToModifiedJulianDate`   |   19.285 ns |  0.215 ns  |      0 B  |
-| `ToAstronomicalJD`       |   19.947 ns |  1.159 ns  |      0 B  |
-| `FromModifiedJulianDate` |   21.222 ns |  1.063 ns  |      0 B  |
-| `FromAstronomicalJD`     |   21.368 ns |  1.298 ns  |      0 B  |
-| `SunLongitude`           |   34.763 ns |  0.436 ns  |      0 B  |
-| `GetSolarTermName`       |   38.407 ns |  0.053 ns  |      0 B  |
-| `GetSolarTerm`           |   53.821 ns | 13.512 ns  |      0 B  |
-| `ToVietnameseLunar`      | 2,272 ns    | 43.029 ns  |      0 B  |
-| `FromVietnameseLunar`    | 2,397 ns    | 87.677 ns  |      0 B  |
+| `FromOrdinalDate`        |    2.090 ns |  0.804 ns  |      0 B  |
+| `ToOrdinalDate`          |    2.904 ns |  0.579 ns  |      0 B  |
+| `ToAstronomicalJD`       |   11.800 ns |  0.011 ns  |      0 B  |
+| `FromAstronomicalJD`     |   12.018 ns |  0.031 ns  |      0 B  |
+| `ToModifiedJulianDate`   |   12.702 ns |  1.981 ns  |      0 B  |
+| `FromModifiedJulianDate` |   19.657 ns |  0.528 ns  |      0 B  |
+| `SunLongitude`           |   20.855 ns |  0.040 ns  |      0 B  |
+| `GetSolarTerm`           |   36.326 ns |  0.046 ns  |      0 B  |
+| `GetSolarTermName`       |   38.149 ns |  0.034 ns  |      0 B  |
+| `FromVietnameseLunar`    |  1,095 ns   |  0.804 ns  |      0 B  |
+| `ToVietnameseLunar`      |  1,155 ns   |  1.217 ns  |      0 B  |
 
 **✅ Zero allocations across all methods** — safe for hot paths, tight loops, and real-time systems.
 
 > **Note:** `LutDecode` and `NewMoon` show ~0 ns because the JIT eliminates them as compile-time constants — ideal behavior.
-> `ToVietnameseLunar` at ~2.3 µs reflects full astronomical computation (multiple `NewMoon` + `SunLongitude` calls) with **zero heap allocations**.
+> `ToVietnameseLunar` at ~1.2 µs and `FromVietnameseLunar` at ~1.1 µs reflect full astronomical computation with a pre-computed **Month-11 cache** (~2× faster than uncached), with **zero heap allocations**.
 
 ---
 
